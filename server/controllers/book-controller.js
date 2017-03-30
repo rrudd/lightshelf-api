@@ -35,4 +35,20 @@ deleteBook = function(req, res) {
   });
 }
 
-module.exports = {saveBook: saveBook, deleteBook: deleteBook};
+/**
+ * Find books from library by title. Uses a partial case-insensitive match by
+ * book title. Response will contain an array of books that match the criteria.
+ */
+findBook = function(req, res) {
+  let query = Book.where({ title : { $regex : req.query.title, $options : "i"} });
+  query.exec(function(err, books) {
+    if (err) {
+      console.log(err);
+      res.status(500).json({status : 'failure', message: 'Operation failed.'});
+    } else {
+      res.status(200).json({status: 'success', books: books})
+    }
+  });
+}
+
+module.exports = {saveBook: saveBook, deleteBook: deleteBook, findBook: findBook};
