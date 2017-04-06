@@ -1,16 +1,17 @@
 var Book = require('../models/book');
+var BookInfo = require('../models/book-info');
 
-saveBook = function(req, res) {
-
+/**
+ * Create a book object to the books collection on the database.
+ * A book object is connected to one book-info object which contains 
+ * the general book information.
+ */
+createBook = function(bookInfo, req, res) {
   var book = new Book();
-  book.id = req.body.id;
-  book.title = req.body.title;
-  book.description = req.body.description;
-  book.authors = req.body.authors;
-  book.pageCount = req.body.pageCount;
-  book.imageLinks = req.body.imageLinks;
+  book.id = bookInfo.id;
   book.office = req.body.office_id;
   book.current_loan = null;
+  book.bookInfo = bookInfo._id;
 
   book.save(function(err) {
     if (err) {
@@ -24,8 +25,36 @@ saveBook = function(req, res) {
       res.status(200).json({ status: 'success', book: book });
     }
   });
+
 }
 
+/**
+ * Save a book to the library.
+ */
+saveBook = function(req, res) {
+
+  //TODO what if the book info already exists? should do find first
+  var bookInfo = new BookInfo()
+  bookInfo.id = req.body.id;
+  bookInfo.title = req.body.bookInfo.title;
+  bookInfo.description = req.body.bookInfo.description;
+  bookInfo.authors = req.body.bookInfo.authors;
+  bookInfo.pageCount = req.body.bookInfo.pageCount;
+  bookInfo.imageLinks = req.body.bookInfo.imageLinks;
+
+  bookInfo.save(function(err) {
+    if (err) {
+      //TODO if cannot create info cause it already exists?
+      console.log(err);
+      res.status(500).json({status: 'failure', message: 'Failed to create book info'});
+    } else {
+      createBook(bookInfo, req, res);
+    }
+  });
+
+}
+
+//TODO should we also remove the BookInfo document if this is the last copy of that book?
 deleteBook = function(req, res) {
   Book.remove({
       _id: req.params.book_id
