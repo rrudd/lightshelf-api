@@ -2,6 +2,7 @@ var Book = require('../models/book');
 var Loan = require('../models/loan');
 var config = require('../../config.js');
 var jwt = require('jwt-simple');
+var BookView = require('../models/book-view');
 
 borrowBook = function(req, res) {
   var book_id = req.params.book_id;
@@ -13,7 +14,7 @@ borrowBook = function(req, res) {
     user_id = decoded.id;
     user_name = decoded.fullname;
 
-    // Check that the book exists
+    // Check that the book exists 
     Book.findById(book_id, function(err, book) {
 
       // Check if there's already an active loan for this book
@@ -30,8 +31,10 @@ borrowBook = function(req, res) {
                 if (err) res.json({ status: 'failure', message: 'Borrowing the book failed!' });
                 else {
                   //Populate the book object with the loan object for usagage in the client
-                  Book.populate(newBook, {path: 'current_loan'}, function(err, book) {
-                    res.json({ status: 'success', book: newBook });
+                  Book.populate(newBook, {path: 'current_loan bookInfo'}, function(err, book) {
+                    BookView.transformBookToView(newBook).then((bookView) => {
+                      res.json({ status: 'success', book: bookView });
+                    }) ;
                   });
                 }
               });
@@ -68,7 +71,13 @@ returnBook = function(req, res) {
           else {
             Book.findByIdAndUpdate(book_id, {current_loan: null}, {new: true}, function(err, newBook) {
               if (err) res.json({ status: 'failure', message: 'Returning the book failed!' });
-              else res.json({ status: 'success', book: newBook });
+              else {
+                  Book.populate(newBook, {path: 'bookInfo'}, function(err, newBook) {
+                    BookView.transformBookToView(newBook).then((bookView) => {
+                      res.json({ status: 'success', book: bookView });
+                    });
+                  });
+              }
             })
           }
         });

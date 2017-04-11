@@ -1,5 +1,6 @@
 var Book = require('../models/book');
 var BookInfo = require('../models/book-info');
+var BookView = require('../models/book-view');
 
 /**
  * Create a book object to the books collection on the database.
@@ -51,7 +52,6 @@ saveBook = function(req, res) {
       createBook(bookInfo, req, res);
     }
   });
-
 }
 
 //TODO should we also remove the BookInfo document if this is the last copy of that book?
@@ -64,6 +64,13 @@ deleteBook = function(req, res) {
   });
 }
 
+
+getAllBooks = (req, res) => {
+    Book.find(function(err, books) {
+      if (err) res.send(err);
+      res.json(BookView.transformBookArrayToViews(books));
+    });
+}
 /**
  * Find books from library by title. Uses a partial case-insensitive match by
  * book title. Response will contain an array of books that match the criteria.
@@ -80,4 +87,4 @@ findBook = function(req, res) {
   });
 }
 
-module.exports = {saveBook: saveBook, deleteBook: deleteBook, findBook: findBook};
+module.exports = {saveBook: saveBook, deleteBook: deleteBook, findBook: findBook, getAllBooks: getAllBooks};
