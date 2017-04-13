@@ -6,6 +6,7 @@ var Office = require('./office');
 var BookSchema = new Schema({
   id: {
     type: String,
+    unique: false,
     required: true
   },
   bookInfo: {

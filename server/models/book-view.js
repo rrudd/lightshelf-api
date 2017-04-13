@@ -2,6 +2,20 @@ var Book = require('./book');
 
 class BookView {
     /**
+     * Filter out copies of same book from the view, filtered by the book.id
+     */
+    static filterDuplicateBooks(books) {
+        let uniqueBookIds = [];
+        let noDuplicates = [];
+        books.forEach((book) => {
+            if (uniqueBookIds.indexOf(book.id) === -1) { 
+                noDuplicates.push(book);
+                uniqueBookIds.push(book.id);
+            } 
+        });
+        return noDuplicates;
+    }
+    /**
      * Trasform the book model to view where information is condenced so that there's 
      * no duplicate books (copies of same book) and each book view has info about all the loans of 
      * one type of book.
@@ -16,9 +30,7 @@ class BookView {
             currentLoansPerBook.set(book.id, onLoanUsers);
         });
         //remove duplicates book objects
-        let noDuplicates = books.filter(function (elem, index, self) {
-            return index == self.indexOf(elem);
-        });
+        let noDuplicates = BookView.filterDuplicateBooks(books);
         //Map the book object to contain the number of copies per book
         let transformedBooks = noDuplicates.map(function (book) {
             //TODO remove current_loan, has no information meaning

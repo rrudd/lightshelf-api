@@ -66,4 +66,8 @@ migratedBooks.forEach(function(book) {
     }
 }, this);
 
+//Change the unique index on book.id field to non-unique since we can have several copies of same book
+db.books.dropIndex({ "id" : 1 });
+db.books.createIndex({ "id" : 1 }, { unique: false });
+
 print("Updated " + migratedBooks.length + " book records");

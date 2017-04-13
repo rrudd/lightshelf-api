@@ -3,29 +3,38 @@ var BookInfo = require('../models/book-info');
 var BookView = require('../models/book-view');
 
 /**
- * Create a book object to the books collection on the database.
+ * Create a book objects to the books collection on the database.
  * A book object is connected to one book-info object which contains 
- * the general book information.
+ * the general book information. Creates as many book objects as there's
+ * defined in request parameter "numberOfCopies".
  */
 createBook = function(bookInfo, req, res) {
-  var book = new Book();
-  book.id = bookInfo.id;
-  book.office = req.body.office_id;
-  book.current_loan = null;
-  book.bookInfo = bookInfo._id;
+  let newBooks = [];
+  for (let i = 0; i < req.body.numberOfCopies; i++) {
+    var book = new Book();
+    book.id = bookInfo.id;
+    book.office = req.body.office_id;
+    book.current_loan = null;
+    book.bookInfo = bookInfo._id;
 
-  book.save(function(err) {
-    if (err) {
-      console.log(err);
-      if (err.code == 11000) {
-        res.status(403).json({ status: 'failure', message: 'This book is already in the library!' });
+    newBooks.push(book);
+  }
+
+  if (newBooks.length > 0) {
+    //Insert new book items to the db
+    Book.collection.insert(newBooks, function (err, books) {
+      if (err) {
+        console.log(err);
+        if (err.code == 11000) {
+          res.status(403).json({ status: 'failure', message: 'This book is already in the library!' });
+        }
+        else res.status(500).json({ status: 'failure', message: 'Operation failed.' });
       }
-      else res.status(500).json({ status: 'failure', message: 'Operation failed.' });
-    }
-    else {
-      res.status(200).json({ status: 'success', book: book });
-    }
-  });
+      else {
+        res.status(200).json({ status: 'success', books: books });
+      }
+    });
+  }
 
 }
 
