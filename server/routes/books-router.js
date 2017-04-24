@@ -21,6 +21,15 @@ router.route('/')
     });
   });
 
+router.route('/find')
+
+  .get(function(req, res) {
+    if(req.isAuthenticated()) {
+      bookController.findBook(req, res);
+    }
+    else res.status(401).json({ error: 'Not logged in.' });
+  });
+
 router.route('/:book_id')
 
   //Get a single book by _id

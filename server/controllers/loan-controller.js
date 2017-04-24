@@ -27,7 +27,13 @@ borrowBook = function(req, res) {
             if (err) res.json({ status: 'failure', message: 'Borrowing the book failed.' });
             else {
               Book.findByIdAndUpdate(book_id, {current_loan: loan._id}, {new: true}, function(err, newBook) {
-                res.json({ status: 'success', book: newBook });
+                if (err) res.json({ status: 'failure', message: 'Borrowing the book failed!' });
+                else {
+                  //Populate the book object with the loan object 
+                  Book.populate(newBook, {path: 'current_loan'}, function(err, book) {
+                    res.json({ status: 'success', book: newBook });
+                  });
+                }
               });
             }
           });
