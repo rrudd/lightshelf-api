@@ -1,4 +1,4 @@
 module.exports = {
   'secret' : process.env.LIGHTSHELF_SECRET,
-  'database' : process.env.LIGHTSHELF_DB
+  'database' : process.env.LIGHTSHELF_DB 
 }

@@ -15,10 +15,9 @@ router.route('/')
 
   //Get all books in library
   .get(function(req, res) {
-    Book.find(function(err, books) {
-      if (err) res.send(err);
-      res.json(books);
-    });
+    if (req.isAuthenticated()) {
+      bookController.getAllBooks(req, res);
+    }
   });
 
 router.route('/find')

@@ -6,32 +6,12 @@ var Office = require('./office');
 var BookSchema = new Schema({
   id: {
     type: String,
-    unique: true,
+    unique: false,
     required: true
   },
-  title: {
-    type: String,
-    required: true
-  },
-  description: {
-    type: String
-  },
-  publishedDate: {
-    type: String
-  },
-  pageCount: {
-    type: Number
-  },
-  imageLinks: {
-    smallThumbnail: {
-      type: String
-    },
-    thumbnail: {
-      type: String
-    },
-  },
-  authors: {
-    type: [String]
+  bookInfo: {
+    type: Schema.ObjectId,
+    ref: 'BookInfo'
   },
   current_loan: {
     type: Schema.ObjectId,
@@ -46,6 +26,7 @@ var BookSchema = new Schema({
 
 var autoPopulateLoan = function(next) {
   this.populate('current_loan');
+  this.populate('bookInfo');
   next();
 };
 
