@@ -1,4 +1,4 @@
 module.exports = {
-  'secret' : 'foobar',
-  'database' : 'mongodb://localhost:27017/lightshelf'
+  'secret' : process.env.LIGHTSHELF_SECRET,
+  'database' : process.env.LIGHTSHELF_DB 
 }
